@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { fetchAttendance } from "../api/api";
 
 function Dashboard() {
     const [attendance, setAttendance] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Replace with your real backend endpoint later
-    const API_BASE = "http://127.0.0.1:8000";
-
     useEffect(() => {
-        async function fetchAttendance() {
+        async function load() {
             try {
-                const response = await fetch(`${API_BASE}/attendance/all`);
-                const data = await response.json();
+                const data = await fetchAttendance();
                 setAttendance(data.records || []);
             } catch (error) {
                 console.error("Error fetching attendance:", error);
@@ -20,7 +18,7 @@ function Dashboard() {
             }
         }
 
-        fetchAttendance();
+        load();
     }, []);
 
     return (
@@ -40,14 +38,22 @@ function Dashboard() {
                             <th>Name</th>
                             <th>Time</th>
                             <th>Status</th>
+                            <th>Confidence</th>
+                            <th>Profile</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {attendance.map((record, index) => (
-                            <tr key={index}>
+                        {attendance.map((record) => (
+                            <tr key={`${record.user_id}-${record.time}`}>
                                 <td>{record.name}</td>
                                 <td>{record.time}</td>
                                 <td>{record.status}</td>
+                                <td>{record.confidence?.toFixed?.(2)}</td>
+                                <td>
+                                    <Link to={`/profile/${record.user_id}`}>
+                                        View Profile
+                                    </Link>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
@@ -58,8 +64,3 @@ function Dashboard() {
 }
 
 export default Dashboard;
-<td>
-    <Link to={`/profile/${record.user_id}`}>
-        View Profile
-    </Link>
-</td>

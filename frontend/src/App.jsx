@@ -1,10 +1,8 @@
-import Profile from "./pages/Profile";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Register from "./pages/Register";
 import Recognize from "./pages/Recognize";
 import Dashboard from "./pages/Dashboard";
-<Route path="/profile/:userId" element={<Profile />} />
-<Link to="/profile/1">My Profile</Link>
+import Profile from "./pages/Profile";
 
 function App() {
     return (
@@ -19,6 +17,7 @@ function App() {
                 <Route path="/" element={<Register />} />
                 <Route path="/recognize" element={<Recognize />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile/:userId" element={<Profile />} />
             </Routes>
         </BrowserRouter>
     );
