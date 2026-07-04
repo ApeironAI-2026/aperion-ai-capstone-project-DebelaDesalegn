@@ -4,6 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.api.register import router as register_router
 from backend.api.recognize import router as recognize_router
 
+from backend.api.attendance import router as attendance_router
+
+app.include_router(attendance_router)
+
+
 app = FastAPI()
 
 app.add_middleware(

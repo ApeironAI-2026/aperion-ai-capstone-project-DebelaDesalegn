@@ -1,42 +1,48 @@
 import { useState } from "react";
 import { registerUser } from "../api/api";
 
-export default function Register() {
+function Register() {
     const [name, setName] = useState("");
-    const [file, setFile] = useState(null);
-    const [result, setResult] = useState(null);
+    const [image, setImage] = useState(null);
+    const [message, setMessage] = useState("");
 
-    const handleSubmit = async () => {
-        if (!name || !file) {
-            alert("Please enter a name and select an image");
-            return;
-        }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-        const response = await registerUser(name, file);
-        setResult(response);
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("file", image);
+
+        const result = await registerUser(formData);
+        setMessage(result.message || "User registered successfully!");
     };
 
     return (
-        <div>
+        <div className="container">
             <h2>Register User</h2>
 
-            <input
-                type="text"
-                placeholder="Enter name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-            />
+            <form onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    placeholder="Enter name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                />
 
-            <input
-                type="file"
-                onChange={(e) => setFile(e.target.files[0])}
-            />
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImage(e.target.files[0])}
+                    required
+                />
 
-            <button onClick={handleSubmit}>Register</button>
+                <button type="submit">Register</button>
+            </form>
 
-            {result && (
-                <pre>{JSON.stringify(result, null, 2)}</pre>
-            )}
+            {message && <p>{message}</p>}
         </div>
     );
 }
+
+export default Register;
