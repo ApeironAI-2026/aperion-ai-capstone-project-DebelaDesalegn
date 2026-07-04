@@ -47,3 +47,6 @@ deepface_cache/
 # Build artifacts
 dist/
 build/
+
+models_local/
+*.onnx

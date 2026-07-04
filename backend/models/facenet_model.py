@@ -1,7 +1,7 @@
 import numpy as np
 import onnxruntime as ort
 
-session = ort.InferenceSession("backend/models/facenet512.onnx")
+session = ort.InferenceSession("models_local/facenet512.onnx")
 
 def l2_normalize(x):
     return x / np.sqrt(np.sum(np.square(x)))

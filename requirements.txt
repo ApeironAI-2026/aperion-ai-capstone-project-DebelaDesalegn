@@ -8,3 +8,4 @@ pydantic
 python-multipart
 pillow
 scikit-learn
+mtcnn
