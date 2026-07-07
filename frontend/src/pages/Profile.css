@@ -1,0 +1,223 @@
+/* ===================================
+   PROFILE PAGE
+=================================== */
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 30px;
+    text-decoration: none;
+    color: #2563eb;
+    font-weight: 600;
+    transition: 0.25s;
+}
+
+.back-link:hover {
+    color: #1d4ed8;
+}
+
+/* ===================================
+   PROFILE CARD
+=================================== */
+
+.profile-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+    margin-bottom: 35px;
+    transition: transform 0.25s ease;
+}
+
+.profile-card:hover {
+    transform: translateY(-4px);
+}
+
+/* ===================================
+   AVATAR
+=================================== */
+
+.profile-avatar {
+    width: 140px;
+    height: 140px;
+
+    margin: 0 auto 25px;
+
+    border-radius: 50%;
+
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+
+    color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 3rem;
+    font-weight: 700;
+
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.25);
+}
+
+.profile-card h2 {
+    margin-bottom: 10px;
+    color: #1e3a8a;
+}
+
+.profile-badge {
+    display: inline-block;
+
+    padding: 8px 18px;
+
+    background: #dbeafe;
+    color: #1d4ed8;
+
+    border-radius: 999px;
+
+    font-size: .95rem;
+    font-weight: 600;
+
+    margin-bottom: 35px;
+}
+
+/* ===================================
+   STATS
+=================================== */
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.profile-stat {
+    background: #f8fafc;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    padding: 28px 20px;
+
+    transition: .25s;
+}
+
+.profile-stat:hover {
+    background: #eff6ff;
+    transform: translateY(-3px);
+}
+
+.profile-stat h3 {
+    font-size: 2rem;
+    color: #2563eb;
+    margin-bottom: 10px;
+}
+
+.profile-stat p {
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* ===================================
+   SECTION
+=================================== */
+
+.profile-section {
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 18px;
+
+    padding: 35px;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,.05);
+}
+
+.profile-section h3 {
+    margin-bottom: 25px;
+
+    color: #1e40af;
+
+    border-left: 5px solid #2563eb;
+
+    padding-left: 12px;
+}
+
+/* ===================================
+   TABLE
+=================================== */
+
+.profile-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.profile-table th {
+    background: #2563eb;
+    color: white;
+    padding: 16px;
+}
+
+.profile-table td {
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.profile-table tbody tr {
+    transition: .25s;
+}
+
+.profile-table tbody tr:hover {
+    background: #eff6ff;
+}
+
+/* ===================================
+   EMPTY STATE
+=================================== */
+
+.empty-state {
+    text-align: center;
+
+    padding: 60px 20px;
+
+    border: 2px dashed #cbd5e1;
+
+    border-radius: 18px;
+
+    color: #64748b;
+
+    font-size: 1.1rem;
+}
+
+/* ===================================
+   RESPONSIVE
+=================================== */
+
+@media (max-width: 768px) {
+
+    .profile-card {
+        padding: 30px 20px;
+    }
+
+    .profile-avatar {
+        width: 110px;
+        height: 110px;
+        font-size: 2.5rem;
+    }
+
+    .profile-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-section {
+        padding: 25px 20px;
+    }
+
+    .profile-table th,
+    .profile-table td {
+        padding: 12px;
+        font-size: .9rem;
+    }
+}
