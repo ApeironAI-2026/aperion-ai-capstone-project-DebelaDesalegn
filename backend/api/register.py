@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, UploadFile, File, Form, Depends
+from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from backend.auth import require_admin
@@ -11,7 +11,11 @@ from backend.utils.validation import SUPPORTED_FORMATS_LABEL, read_validated_ima
 
 router = APIRouter()
 
-NameField = Annotated[str, Form(description="Person's full name", examples=["Alice Smith"])]
+NameField = Annotated[
+    str,
+    Form(description="Person's full name", examples=["Alice Smith"]),
+]
+
 PhotosField = Annotated[
     list[UploadFile],
     File(
@@ -21,6 +25,7 @@ PhotosField = Annotated[
         ),
     ),
 ]
+
 PhotoField = Annotated[
     UploadFile,
     File(
@@ -41,14 +46,31 @@ async def register_user(
     _: None = Depends(require_admin),
 ):
     if not files:
-        return {"status": "error", "message": "At least one photo is required"}
+        return {
+            "status": "error",
+            "message": "At least one photo is required",
+        }
 
     embeddings = []
-    for upload in files:
-        image_bytes = await read_validated_image(upload)
-        embeddings.append(image_to_embedding(image_bytes))
 
-    user = create_user(name=name, embeddings=embeddings, db=db)
+    for upload in files:
+        try:
+            image_bytes = await read_validated_image(upload)
+            embedding = image_to_embedding(image_bytes)
+            embeddings.append(embedding)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error processing photo: {str(e)}",
+            )
+
+    try:
+        user = create_user(name=name, embeddings=embeddings, db=db)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Database error: {str(e)}",
+        )
 
     return {
         "status": "success",
