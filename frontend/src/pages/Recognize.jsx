@@ -63,7 +63,7 @@ function Recognize() {
             <PageHeader
                 icon="📷"
                 title="Face Recognition"
-                subtitle="Upload a face image to recognize a registered user or record attendance."
+                subtitle="Upload or capture a face image to recognize a registered user or record attendance."
             />
 
             <div className="mode-toggle">
@@ -91,16 +91,14 @@ function Recognize() {
             <form className="form" onSubmit={handleSubmit}>
                 <div className="form-card">
                     <div className="form-section">
-                        <h3>Upload Face Image</h3>
+                        <h3>Face Image</h3>
 
                         <FileUpload
                             multiple={false}
                             files={image}
-                            onChange={(file) => {
-                                console.log("received:",file)
-                                setImage(file);
-                            }}
+                            onChange={setImage}
                             disabled={loading}
+                            allowCamera
                         />
                     </div>
 

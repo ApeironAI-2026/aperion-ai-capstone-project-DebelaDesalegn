@@ -4,6 +4,7 @@ import {
     ACCEPTED_IMAGE_TYPES,
     SUPPORTED_FORMATS_LABEL,
 } from "../../constants/images";
+import CameraCapture from "../CameraCapture";
 
 export default function FileUpload({
     multiple = false,
@@ -12,22 +13,20 @@ export default function FileUpload({
     files = [],
     onChange,
     disabled = false,
+    allowCamera = true,
 }) {
     const inputId = useId();
     const inputRef = useRef(null);
-
     const [dragActive, setDragActive] = useState(false);
+    const [source, setSource] = useState("upload");
 
-    // Normalize to an array
     const selectedFiles = useMemo(() => {
         if (multiple) {
             return Array.isArray(files) ? files : [];
         }
-
         return files ? [files] : [];
     }, [files, multiple]);
 
-    // Image previews
     const [previews, setPreviews] = useState([]);
 
     useEffect(() => {
@@ -54,15 +53,14 @@ export default function FileUpload({
         }
 
         const merged = [...selectedFiles, ...incomingFiles];
-
         const unique = merged.filter(
             (file, index, self) =>
                 index ===
                 self.findIndex(
                     (f) =>
                         f.name === file.name &&
-                        f.lastModified === file.lastModified
-                )
+                        f.lastModified === file.lastModified,
+                ),
         );
 
         onChange(unique.slice(0, maxFiles));
@@ -70,21 +68,29 @@ export default function FileUpload({
 
     const handleFileChange = (event) => {
         const picked = Array.from(event.target.files || []);
-
         processFiles(picked);
-
-        // Allow selecting the same file again
         event.target.value = "";
+    };
+
+    const handleCameraCapture = (file) => {
+        if (!file) return;
+
+        if (!multiple) {
+            onChange(file);
+            return;
+        }
+
+        if (selectedFiles.length >= maxFiles) {
+            return;
+        }
+
+        processFiles([file]);
     };
 
     const removeFile = (fileToRemove) => {
         if (!multiple) {
             onChange(null);
-
-            if (inputRef.current) {
-                inputRef.current.value = "";
-            }
-
+            if (inputRef.current) inputRef.current.value = "";
             return;
         }
 
@@ -93,43 +99,31 @@ export default function FileUpload({
                 !(
                     file.name === fileToRemove.name &&
                     file.lastModified === fileToRemove.lastModified
-                )
+                ),
         );
 
         onChange(updated);
-
-        if (inputRef.current) {
-            inputRef.current.value = "";
-        }
+        if (inputRef.current) inputRef.current.value = "";
     };
 
     const clearAll = () => {
         onChange(multiple ? [] : null);
-
-        if (inputRef.current) {
-            inputRef.current.value = "";
-        }
+        if (inputRef.current) inputRef.current.value = "";
     };
 
     const openPicker = () => {
-        if (!disabled) {
-            inputRef.current?.click();
-        }
+        if (!disabled) inputRef.current?.click();
     };
 
     const handleDragEnter = (event) => {
         event.preventDefault();
         event.stopPropagation();
-
-        if (!disabled) {
-            setDragActive(true);
-        }
+        if (!disabled) setDragActive(true);
     };
 
     const handleDragLeave = (event) => {
         event.preventDefault();
         event.stopPropagation();
-
         setDragActive(false);
     };
 
@@ -141,59 +135,103 @@ export default function FileUpload({
     const handleDrop = (event) => {
         event.preventDefault();
         event.stopPropagation();
-
         setDragActive(false);
-
         if (disabled) return;
 
         const droppedFiles = Array.from(event.dataTransfer.files || []).filter(
-            (file) => file.type.startsWith("image/")
+            (file) => file.type.startsWith("image/"),
         );
-
         processFiles(droppedFiles);
     };
-        return (
+
+    const cameraFull =
+        multiple && selectedFiles.length >= maxFiles;
+
+    return (
         <div className="file-upload">
+            {allowCamera && (
+                <div className="source-toggle" role="tablist">
+                    <button
+                        type="button"
+                        role="tab"
+                        className={
+                            source === "upload"
+                                ? "source-btn active"
+                                : "source-btn"
+                        }
+                        onClick={() => setSource("upload")}
+                        disabled={disabled}
+                    >
+                        Upload
+                    </button>
+                    <button
+                        type="button"
+                        role="tab"
+                        className={
+                            source === "camera"
+                                ? "source-btn active"
+                                : "source-btn"
+                        }
+                        onClick={() => setSource("camera")}
+                        disabled={disabled}
+                    >
+                        Camera
+                    </button>
+                </div>
+            )}
+
             <input
                 id={inputId}
                 ref={inputRef}
                 type="file"
                 accept={accept}
+                capture="environment"
                 multiple={multiple}
                 disabled={disabled}
                 onChange={handleFileChange}
                 className="file-upload-input"
             />
 
-            <div
-                className={`upload-zone ${dragActive ? "drag-active" : ""} ${
-                    disabled ? "disabled" : ""
-                }`}
-                onClick={openPicker}
-                onDragEnter={handleDragEnter}
-                onDragLeave={handleDragLeave}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-            >
-                <div className="upload-icon">☁️</div>
-
-                <h3>
-                    {multiple
-                        ? "Upload Face Images"
-                        : "Upload Face Image"}
-                </h3>
-
-                <p>
-                    Drag &amp; Drop your image{multiple ? "s" : ""} here
-                    <br />
-                    <strong>or click to browse</strong>
-                </p>
-
-                <small>
-                    {SUPPORTED_FORMATS_LABEL}
-                    {multiple && ` • Maximum ${maxFiles} images`}
-                </small>
-            </div>
+            {source === "upload" || !allowCamera ? (
+                <div
+                    className={`upload-zone ${dragActive ? "drag-active" : ""} ${
+                        disabled ? "disabled" : ""
+                    }`}
+                    onClick={openPicker}
+                    onDragEnter={handleDragEnter}
+                    onDragLeave={handleDragLeave}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                >
+                    <div className="upload-icon">☁️</div>
+                    <h3>
+                        {multiple ? "Upload Face Images" : "Upload Face Image"}
+                    </h3>
+                    <p>
+                        Drag &amp; Drop your image{multiple ? "s" : ""} here
+                        <br />
+                        <strong>or click to browse</strong>
+                    </p>
+                    <small>
+                        {SUPPORTED_FORMATS_LABEL}
+                        {multiple && ` • Maximum ${maxFiles} images`}
+                    </small>
+                </div>
+            ) : (
+                <div className="camera-panel">
+                    {cameraFull ? (
+                        <div className="camera-limit">
+                            Maximum of {maxFiles} images reached. Remove one to
+                            capture another.
+                        </div>
+                    ) : (
+                        <CameraCapture
+                            onCapture={handleCameraCapture}
+                            disabled={disabled}
+                        />
+                    )}
+                </div>
+            )}
 
             {multiple && (
                 <div className="upload-counter">
@@ -226,17 +264,14 @@ export default function FileUpload({
                                     alt={file.name}
                                     className="preview-image"
                                 />
-
                                 <div className="preview-info">
                                     <div className="preview-name">
                                         {file.name}
                                     </div>
-
                                     <div className="preview-size">
                                         {(file.size / 1024).toFixed(0)} KB
                                     </div>
                                 </div>
-
                                 <button
                                     type="button"
                                     className="remove-btn"

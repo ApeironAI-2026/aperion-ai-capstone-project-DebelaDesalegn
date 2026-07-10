@@ -1,21 +1,36 @@
-const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
-console.log("API_BASE =", API_BASE);
-const ADMIN_KEY = import.meta.env.VITE_ADMIN_API_KEY || "";
+import { authHeaders } from "../auth/storage";
 
-const adminHeaders = () =>
-    ADMIN_KEY ? { "X-Admin-Key": ADMIN_KEY } : {};
+const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
+
+async function parseJson(response) {
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+        const detail = data.detail || "Request failed.";
+        throw new Error(
+            Array.isArray(detail)
+                ? detail.map((item) => item.msg || String(item)).join(", ")
+                : detail,
+        );
+    }
+    return data;
+}
 
 export const registerUser = async (formData) => {
     const response = await fetch(`${API_BASE}/register/register`, {
         method: "POST",
-        headers: adminHeaders(),
+        headers: {
+            ...authHeaders(),
+        },
         body: formData,
     });
-    return response.json();
+    return parseJson(response);
 };
+
 export const fetchUsers = async () => {
-    const response = await fetch(`${API_BASE}/users/`);
-    return response.json();
+    const response = await fetch(`${API_BASE}/users/`, {
+        headers: authHeaders(),
+    });
+    return parseJson(response);
 };
 
 export const recognizeUser = async (formData, logAttendance = false) => {
@@ -27,7 +42,7 @@ export const recognizeUser = async (formData, logAttendance = false) => {
         method: "POST",
         body: formData,
     });
-    return response.json();
+    return parseJson(response);
 };
 
 export const markAttendance = async (formData) => {
@@ -35,42 +50,49 @@ export const markAttendance = async (formData) => {
         method: "POST",
         body: formData,
     });
-    return response.json();
+    return parseJson(response);
 };
 
 export const fetchAttendance = async () => {
-    const response = await fetch(`${API_BASE}/attendance/all`);
-    return response.json();
+    const response = await fetch(`${API_BASE}/attendance/all`, {
+        headers: authHeaders(),
+    });
+    return parseJson(response);
 };
 
 export const fetchAnalytics = async () => {
-    const response = await fetch(`${API_BASE}/attendance/analytics/`);
-    return response.json();
+    const response = await fetch(`${API_BASE}/attendance/analytics/`, {
+        headers: authHeaders(),
+    });
+    return parseJson(response);
 };
 
 export const fetchUserProfile = async (userId) => {
-    const response = await fetch(`${API_BASE}/users/profile/${userId}`);
-    if (!response.ok) {
+    const response = await fetch(`${API_BASE}/users/profile/${userId}`, {
+        headers: authHeaders(),
+    });
+    if (response.status === 404) {
         return null;
     }
-    return response.json();
+    return parseJson(response);
 };
 
-export { API_BASE };
 export const chatWithAssistant = async (message) => {
     const response = await fetch(`${API_BASE}/assistant/chat`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            ...authHeaders(),
         },
         body: JSON.stringify({ message }),
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.detail || "Assistant request failed.");
-    }
-
-    return data;
+    return parseJson(response);
 };
+
+export { API_BASE };
+export {
+    fetchAuthStatus,
+    loginAdmin,
+    fetchAuthMe,
+} from "./authApi";

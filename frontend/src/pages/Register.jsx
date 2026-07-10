@@ -64,7 +64,7 @@ export default function Register() {
             <PageHeader
                 icon="👤"
                 title="Register New User"
-                subtitle="Register a new person by entering their name and uploading between 1 and 5 clear face images."
+                subtitle="Register a new person by entering their name and uploading or capturing between 1 and 5 clear face images."
             />
 
             <form className="form" onSubmit={handleSubmit}>
@@ -95,6 +95,7 @@ export default function Register() {
                             files={images}
                             onChange={setImages}
                             disabled={loading}
+                            allowCamera
                         />
                     </div>
 

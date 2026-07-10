@@ -8,7 +8,7 @@ A face-recognition attendance app: detect a face, match it against registered us
 - **Recognize** a face or **mark attendance** in one step
 - In-memory **embedding index** with batch cosine similarity search
 - **Duplicate check-in prevention** (one attendance per user per day)
-- Optional **admin API key** for registration
+- Optional **admin login** (JWT) for registration, dashboard, and assistant
 - **Rate limiting** on API endpoints
 - Dashboard, analytics, and user profiles
 
@@ -179,7 +179,11 @@ Copy `.env.example` and adjust as needed.
 
 | Variable           | Default   | Description                                      |
 |--------------------|-----------|--------------------------------------------------|
-| `ADMIN_API_KEY`    | (empty)   | If set, registration requires `X-Admin-Key`      |
+| `ADMIN_USERNAME`   | `admin`   | Admin login username                             |
+| `ADMIN_PASSWORD`   | (empty)   | If set, enables admin JWT login                  |
+| `JWT_SECRET`       | dev value | Secret used to sign admin tokens                 |
+| `JWT_EXPIRE_HOURS` | `12`      | Admin token lifetime                             |
+| `ADMIN_API_KEY`    | (empty)   | Optional alternate admin header (`X-Admin-Key`)  |
 | `MATCH_THRESHOLD`  | `0.7`     | Cosine similarity threshold for a match          |
 | `MAX_UPLOAD_BYTES` | `5242880` | Max upload size (5 MB)                           |
 | `CORS_ORIGINS`     | `*`       | Comma-separated allowed origins                  |
@@ -191,7 +195,6 @@ Copy `.env.example` and adjust as needed.
 | Variable              | Default                  | Description                |
 |-----------------------|--------------------------|----------------------------|
 | `VITE_API_BASE`       | `http://127.0.0.1:8000`  | Backend URL                |
-| `VITE_ADMIN_API_KEY`  | (empty)                  | Sent on register requests  |
 
 ---
 
@@ -352,7 +355,6 @@ In Vercel → **Project → Settings → Environment Variables**:
 | Name | Value | Example |
 |------|--------|---------|
 | `VITE_API_BASE` | Your Hugging Face Space URL | `https://your-username-face-attendance-api.hf.space` |
-| `VITE_ADMIN_API_KEY` | Same as backend `ADMIN_API_KEY` | `your-secret-key` |
 
 Apply to **Production**, **Preview**, and **Development**.
 
@@ -393,8 +395,8 @@ Redeploy or restart the Space if needed.
 |------|------------------------|-------------------|
 | 1 | Create Docker Space | Import repo, root = `frontend` |
 | 2 | Add `facenet512.onnx` to `models_local/` | Set `VITE_API_BASE` to HF Space URL |
-| 3 | Set `ADMIN_API_KEY` | Set `VITE_ADMIN_API_KEY` (same key) |
-| 4 | Set `CORS_ORIGINS` to Vercel URL | Deploy |
+| 3 | Set `ADMIN_PASSWORD` + `JWT_SECRET` | Deploy (login via UI) |
+| 4 | Set `CORS_ORIGINS` to Vercel URL | Sign in as admin |
 | 5 | Verify `/health` and `/docs` | Test register → recognize → dashboard |
 
 ---
@@ -466,6 +468,19 @@ Example questions:
 - How many attendance records are stored?
 
 The assistant retrieves information directly from the attendance database and returns conversational responses.
+
+## Admin authentication
+
+Set `ADMIN_PASSWORD` (and optionally `ADMIN_USERNAME`, `JWT_SECRET`) on the backend. Then:
+
+1. Open **Admin login** in the UI (`/login`)
+2. Sign in to unlock Register, Dashboard, and Assistant
+3. Recognize / mark attendance stays public for kiosk use
+
+API clients can `POST /auth/login` and send `Authorization: Bearer <token>`.  
+`ADMIN_API_KEY` via `X-Admin-Key` still works as an alternate server-side credential.
+
+If neither `ADMIN_PASSWORD` nor `ADMIN_API_KEY` is set, admin routes stay open (local development).
 
 ## License
 

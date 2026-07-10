@@ -4,6 +4,14 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from backend.database.models import Attendance, User
+def list_users(db: Session) -> dict:
+    records = (
+        db.query(User)
+        # .join(User)
+        # .order_by(Attendance.timestamp.desc())
+        .all()
+    )
+    return records
 
 
 def compute_analytics(db: Session) -> dict:
@@ -13,6 +21,7 @@ def compute_analytics(db: Session) -> dict:
         .order_by(Attendance.timestamp.desc())
         .all()
     )
+   
 
     total_entries = len(records)
     per_person: dict[str, int] = defaultdict(int)
