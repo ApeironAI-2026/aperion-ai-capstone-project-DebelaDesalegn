@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Face Attendance System
 
 A face-recognition attendance app: detect a face, match it against registered users, and log check-ins. Built with **MTCNN** + **FaceNet512 (ONNX)**, **FastAPI**, **React + Vite**, and **SQLite**.
@@ -485,3 +486,7 @@ If neither `ADMIN_PASSWORD` nor `ADMIN_API_KEY` is set, admin routes stay open (
 ## License
 
 Add your license here.
+=======
+[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=24234811&assignment_repo_type=AssignmentRepo)
+# final_capstone_project-
+>>>>>>> 8f7d04b504aa9a793f31822e35a20499e5e3c346
